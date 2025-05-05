@@ -3,9 +3,16 @@ find_git_branch() {
   local branch
   if branch=$(git rev-parse --abbrev-ref HEAD 2> /dev/null); then
     if [[ "$branch" == "HEAD" ]]; then
-      branch='detached*'
+        branch='detached*'
+    else
+        if [[ ${#branch} -gt 27 ]]; then
+            # Truncate the string to max_length characters
+            truncated_string="${branch:0:27}"
+            git_branch="($truncated_string...)"
+        else
+            git_branch="($branch)"
+        fi
     fi
-    git_branch="($branch)"
   else
     git_branch=""
   fi
@@ -28,7 +35,7 @@ PROMPT_COMMAND="find_git_branch; $PROMPT_COMMAND"
 export PS1="\u@Mac [ws:$WS] \W \[$txtcyn\]\$git_branch \$ "
 
 # Another variant:
-export PS1="\[$bldgrn\]\u@Mac\[$txtrst\] \w \[$bldylw\]\$git_branch\[$txtcyn\]\$git_dirty\[$txtrst\]\$ "
+export PS1="\[$txtgrn\]\u@Mac\[$txtrst\] \w \[$txtcyn\]\$git_branch\[$txtcyn\]\$git_dirty\[$txtrst\]\$ "
 
 # Default Git enabled root prompt (for use with "sudo -s")
 # export SUDO_PS1="\[$bakred\]\u@\h\[$txtrst\] \w\$ "
